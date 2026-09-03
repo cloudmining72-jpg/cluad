@@ -10,51 +10,55 @@ New-Item -ItemType Directory -Path $deployDir | Out-Null
 New-Item -ItemType Directory -Path "$deployDir\app" | Out-Null
 New-Item -ItemType Directory -Path "$deployDir\uploads" | Out-Null
 
-# 1. Backend files (server.js with OTP system)
-Copy-Item "server.js"           -Destination "$deployDir\" -Force
-Copy-Item "ecosystem.config.cjs"-Destination "$deployDir\" -Force
-Copy-Item ".env"                -Destination "$deployDir\" -Force
-Copy-Item ".htaccess"           -Destination "$deployDir\" -Force
-Copy-Item "package.json"        -Destination "$deployDir\" -Force
-Write-Host "  -> Backend files copied"
+# 1. Backend files
+Copy-Item "server.js"            -Destination "$deployDir\" -Force
+Copy-Item "ecosystem.config.cjs" -Destination "$deployDir\" -Force
+Copy-Item ".env"                 -Destination "$deployDir\" -Force
+Copy-Item ".htaccess"            -Destination "$deployDir\" -Force
+Copy-Item "package.json"         -Destination "$deployDir\" -Force
+Write-Host "  -> Backend files OK"
 
-# 2. Latest Landing Page files
-Copy-Item "index.html"  -Destination "$deployDir\" -Force
-Copy-Item "style.css"   -Destination "$deployDir\" -Force
-Copy-Item "script.js"   -Destination "$deployDir\" -Force
-Write-Host "  -> Landing page files copied"
+# 2. Landing Page files (FIXED: APK links corrected)
+Copy-Item "index.html" -Destination "$deployDir\" -Force
+Copy-Item "style.css"  -Destination "$deployDir\" -Force
+Copy-Item "script.js"  -Destination "$deployDir\" -Force
+Write-Host "  -> Landing page OK (APK links fixed)"
 
-# 3. Logo & Image files at ROOT (fixes logo not showing bug)
-Copy-Item "claudemining-logo.jpg"   -Destination "$deployDir\" -Force -ErrorAction SilentlyContinue
-Copy-Item "claudex-logo.jpg"        -Destination "$deployDir\" -Force -ErrorAction SilentlyContinue
-Copy-Item "favicon.svg"             -Destination "$deployDir\" -Force -ErrorAction SilentlyContinue
-Copy-Item "app-download-preview.jpg"-Destination "$deployDir\" -Force -ErrorAction SilentlyContinue
-Copy-Item "datacenter.jpg"          -Destination "$deployDir\" -Force -ErrorAction SilentlyContinue
-Write-Host "  -> Logo & image files copied to root (logo fix applied)"
+# 3. Logo & image files at ROOT (logo fix)
+Copy-Item "claudemining-logo.jpg"    -Destination "$deployDir\" -Force -ErrorAction SilentlyContinue
+Copy-Item "claudex-logo.jpg"         -Destination "$deployDir\" -Force -ErrorAction SilentlyContinue
+Copy-Item "favicon.svg"              -Destination "$deployDir\" -Force -ErrorAction SilentlyContinue
+Write-Host "  -> Logo files at root OK"
 
-# 4. APK file (latest bahi-bahi.apk)
+# 4. APK - bahi-bahi.apk RENAMED to ClaudeMining.apk
 if (Test-Path "bahi-bahi.apk") {
-    Copy-Item "bahi-bahi.apk" -Destination "$deployDir\" -Force
-    Write-Host "  -> bahi-bahi.apk copied"
+    Copy-Item "bahi-bahi.apk" -Destination "$deployDir\ClaudeMining.apk" -Force
+    $apkSize = [math]::Round((Get-Item "bahi-bahi.apk").Length / 1MB, 1)
+    Write-Host "  -> ClaudeMining.apk ($apkSize MB) from bahi-bahi.apk - OK"
 }
 
-# 5. React app from dist folder -> app/
+# 5. React app dist -> app/
 if (Test-Path "dist") {
     Copy-Item "dist\*" -Destination "$deployDir\app\" -Recurse -Force
-    Write-Host "  -> dist (React app) copied to app/"
     if (Test-Path "$deployDir\app\react.html") {
         Rename-Item "$deployDir\app\react.html" "index.html"
-        Write-Host "  -> react.html renamed to index.html"
+        Write-Host "  -> React app copied to app/ folder"
     }
 }
 
-# 6. Public folder
-if (Test-Path "public") {
-    Copy-Item "public" -Destination "$deployDir\" -Recurse -Force
-    Write-Host "  -> public/ copied"
+# 6. Assets folder (has logo.jpg, mining images etc)
+if (Test-Path "assets") {
+    Copy-Item "assets" -Destination "$deployDir\" -Recurse -Force
+    Write-Host "  -> assets/ folder OK"
 }
 
-# 7. Nginx config
+# 7. Public folder
+if (Test-Path "public") {
+    Copy-Item "public" -Destination "$deployDir\" -Recurse -Force
+    Write-Host "  -> public/ folder OK"
+}
+
+# 8. Nginx config
 if (Test-Path "nginx_sample.conf") {
     Copy-Item "nginx_sample.conf" -Destination "$deployDir\" -Force
 }
@@ -63,13 +67,13 @@ Write-Host ""
 Write-Host "Creating ZIP..."
 Compress-Archive -Path "$deployDir\*" -DestinationPath $zipPath -Force
 
-Write-Host "Cleanup temp dir..."
+Write-Host "Cleanup..."
 Remove-Item $deployDir -Recurse -Force
 
 $size = [math]::Round((Get-Item $zipPath).Length / 1MB, 2)
 Write-Host ""
 Write-Host "============================================"
-Write-Host " DONE! ZIP Created: $zipPath"
-Write-Host " Size: $size MB"
-Write-Host " Location: $(Get-Location)\$zipPath"
+Write-Host " DONE! ZIP: $zipPath ($size MB)"
+Write-Host " APK: bahi-bahi.apk -> ClaudeMining.apk"
+Write-Host " Fixes: Logo at root + APK links corrected"
 Write-Host "============================================"

@@ -524,10 +524,10 @@ function renderDownload(){
       <div class="app-meta">
         <div class="meta-item"><span class="meta-label">Platform</span><span class="meta-val">Android 7.0+</span></div>
         <div class="meta-item"><span class="meta-label">File Type</span><span class="meta-val">.APK</span></div>
-        <div class="meta-item"><span class="meta-label">File Size</span><span class="meta-val">16.4 MB</span></div>
+        <div class="meta-item"><span class="meta-label">File Size</span><span class="meta-val">40 MB</span></div>
         <div class="meta-item"><span class="meta-label">Price</span><span class="meta-val green">FREE</span></div>
       </div>
-      <a href="/ClaudeMining.apk" download="ClaudeMining.apk" class="download-btn">${svg(I.dl,'currentColor',22)} Download ClaudeMining.apk &mdash; Free</a>
+      <a href="/ClaudeMining.apk" download="ClaudeMining.apk" class="download-btn">${svg(I.dl,'currentColor',22)} ⬇ Download ClaudeMining App &mdash; Free</a>
       <div class="download-trust"><div class="dt-item">&#10003; 100% Free</div><div class="dt-item">&#128274; Virus Free &bull; Verified</div><div class="dt-item">&#9889; Fast Direct Install</div></div>
     </div>
     <div class="install-guide">
