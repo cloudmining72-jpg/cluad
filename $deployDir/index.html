@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="theme-color" content="#0a0e17">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+  <meta name="description" content="ClaudeMining - Professional cloud cryptocurrency mining platform. Earn 200% returns in 30 days. Tier-4 ASIC hardware datacenter. Download the official Android APK.">
+  <meta name="keywords" content="cloud mining, crypto mining, bitcoin mining, ClaudeMining, ASIC mining, cryptocurrency investment, daily profit, download APK">
+  <meta name="robots" content="index, follow">
+  <title>ClaudeMining &mdash; Professional Cloud Mining Platform</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+  <div class="nav-container">
+    <div class="nav-brand" onclick="showPage('home')" style="cursor:pointer;">
+      <img src="assets/logo.jpg" alt="ClaudeMining Logo" class="brand-logo">
+      <span class="brand-text">Claude<span class="brand-accent">Mining</span></span>
+    </div>
+    
+    <ul class="nav-links" role="list">
+      <li><a class="nav-link active" href="#" onclick="showPage('home');return false;" data-page="home">Home</a></li>
+      <li><a class="nav-link" href="#" onclick="showPage('about');return false;" data-page="about">About</a></li>
+      <li><a class="nav-link" href="#" onclick="showPage('features');return false;" data-page="features">Features</a></li>
+      <li><a class="nav-link" href="#" onclick="showPage('plans');return false;" data-page="plans">Mining Plans</a></li>
+      <li><a class="nav-link" href="#" onclick="showPage('howto');return false;" data-page="howto">How It Works</a></li>
+      <li><a class="nav-link" href="#" onclick="showPage('download');return false;" data-page="download">Download</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button class="btn-nav-cta" onclick="showPage('download')" id="nav-download-btn">
+        &#11015; Download APK
+      </button>
+      <div class="mobile-menu-toggle" onclick="toggleMobileMenu()" id="menuToggle" aria-label="Toggle navigation menu" role="button" tabindex="0">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE DRAWER -->
+<div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+  <div class="mobile-drawer-header">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <img src="assets/logo.jpg" alt="ClaudeMining" style="width:32px;height:32px;border-radius:50%;">
+      <span style="font-weight:800;font-size:16px;color:#f3f4f6;">Claude<span style="color:#06b6d4;">Mining</span></span>
+    </div>
+    <button onclick="toggleMobileMenu()" class="drawer-close-btn">&times;</button>
+  </div>
+  <div class="mobile-drawer-links">
+    <a class="mob-link" href="#" onclick="showPage('home');toggleMobileMenu();return false;">&#127968; Home</a>
+    <a class="mob-link" href="#" onclick="showPage('about');toggleMobileMenu();return false;">&#127970; About Platform</a>
+    <a class="mob-link" href="#" onclick="showPage('features');toggleMobileMenu();return false;">&#9889; High-Tech Features</a>
+    <a class="mob-link" href="#" onclick="showPage('plans');toggleMobileMenu();return false;">&#9935; Mining Plans &amp; Returns</a>
+    <a class="mob-link" href="#" onclick="showPage('howto');toggleMobileMenu();return false;">&#128218; How It Works &amp; FAQ</a>
+    <a class="mob-link" href="#" onclick="showPage('download');toggleMobileMenu();return false;" style="color:#10b981;font-weight:800;">&#11015; Download Android APK</a>
+  </div>
+  <div class="mobile-drawer-actions">
+    <a href="ClaudeMining.apk" download="ClaudeMining.apk" class="mob-dl-btn">
+      &#11015; Direct APK Download (112.5 MB)
+    </a>
+  </div>
+</div>
+<div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
+
+<!-- PAGES WRAPPER -->
+<main class="pages-wrapper" role="main">
+  <div class="page active" id="page-home" aria-label="Home page"></div>
+  <div class="page" id="page-about" aria-label="About page"></div>
+  <div class="page" id="page-features" aria-label="Features page"></div>
+  <div class="page" id="page-plans" aria-label="Mining Plans page"></div>
+  <div class="page" id="page-howto" aria-label="How It Works page"></div>
+  <div class="page" id="page-download" aria-label="Download page"></div>
+</main>
+
+<!-- MOBILE BOTTOM QUICK BAR (SMARTPHONE VIEW ONLY) -->
+<nav class="mobile-bottom-bar" aria-label="Quick mobile navigation">
+  <a href="#" onclick="showPage('home');return false;" class="mbb-item active" id="mbb-home">
+    <img src="https://img.icons8.com/3d-fluency/94/home.png" class="mbb-icon" alt="Home" style="width: 24px; height: 24px;">
+    <span class="mbb-text">Home</span>
+  </a>
+  <a href="#" onclick="showPage('about');return false;" class="mbb-item" id="mbb-about">
+    <img src="https://img.icons8.com/3d-fluency/94/city-buildings.png" class="mbb-icon" alt="About" style="width: 24px; height: 24px;">
+    <span class="mbb-text">About</span>
+  </a>
+  <a href="#" onclick="showPage('features');return false;" class="mbb-item" id="mbb-features">
+    <img src="https://img.icons8.com/3d-fluency/94/lightning-bolt.png" class="mbb-icon" alt="Features" style="width: 24px; height: 24px;">
+    <span class="mbb-text">Features</span>
+  </a>
+  <a href="#" onclick="showPage('plans');return false;" class="mbb-item" id="mbb-plans">
+    <img src="https://img.icons8.com/3d-fluency/94/money-bag.png" class="mbb-icon" alt="Plans" style="width: 24px; height: 24px;">
+    <span class="mbb-text">Plans</span>
+  </a>
+  <a href="ClaudeMining.apk" download="ClaudeMining.apk" class="mbb-item highlight" id="mbb-download-app">
+    <span class="mbb-icon">&#11015;</span>
+    <span class="mbb-text">Download</span>
+  </a>
+  <a href="#" onclick="showPage('howto');return false;" class="mbb-item" id="mbb-help">
+    <img src="https://img.icons8.com/3d-fluency/94/chat.png" class="mbb-icon" alt="Help" style="width: 24px; height: 24px;">
+    <span class="mbb-text">Help</span>
+  </a>
+</nav>
+
+<!-- FOOTER -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-container">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <img src="assets/logo.jpg" alt="ClaudeMining Logo" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
+        <span class="brand-text" style="font-size:17px;font-weight:800;">Claude<span class="brand-accent">Mining</span></span>
+      </div>
+      <p class="footer-tagline">Professional cloud cryptocurrency mining infrastructure. Tier-4 data centers in Iceland and USA. 1.25M+ investors across 48+ countries worldwide.</p>
+      <div class="footer-certs">
+        <span class="fcert">FinCEN MSB #31000284</span>
+        <span class="fcert">ISO 27001</span>
+        <span class="fcert">SSL 256-Bit</span>
+      </div>
+    </div>
+    <div class="footer-links">
+      <div class="fl-col">
+        <div class="fl-title">Platform</div>
+        <a class="fl-link" href="#" onclick="showPage('home');return false;">Home</a>
+        <a class="fl-link" href="#" onclick="showPage('features');return false;">Features</a>
+        <a class="fl-link" href="#" onclick="showPage('plans');return false;">Mining Plans</a>
+        <a class="fl-link" href="#" onclick="showPage('download');return false;">Download App</a>
+      </div>
+      <div class="fl-col">
+        <div class="fl-title">Company</div>
+        <a class="fl-link" href="#" onclick="showPage('about');return false;">About Us</a>
+        <a class="fl-link" href="#" onclick="showPage('howto');return false;">How It Works</a>
+        <a class="fl-link" href="#" onclick="showPage('howto');return false;">FAQ</a>
+        <a class="fl-link" href="#" onclick="showPage('download');return false;">Support</a>
+      </div>
+      <div class="fl-col">
+        <div class="fl-title">Contact &amp; Support</div>
+        <a class="fl-link" href="mailto:support@claudemining.com" style="color:#10b981;font-weight:600;">&#128172; support@claudemining.com</a>
+        <a class="fl-link" href="mailto:info@claudemining.com" style="color:#06b6d4;font-weight:600;">&#9993; info@claudemining.com</a>
+        <span class="fl-link">&#127758; UK &amp; USA Headquarters</span>
+        <span class="fl-link">&#9889; Tier-4 ASIC Facilities</span>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2024 ClaudeMining Global Inc. All rights reserved. &bull; Official Platform &bull; Support: <a href="mailto:support@claudemining.com" style="color:#10b981;text-decoration:none;">support@claudemining.com</a></span>
+    <span>&#127968; UK &amp; USA &bull; &#127770; Iceland Datacenter &bull; &#9729; Tier-4 ASIC Facilities</span>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

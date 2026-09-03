@@ -1,0 +1,7 @@
+{
+  "appId": "com.claudemining.app",
+  "appName": "ClaudeMining",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}
+

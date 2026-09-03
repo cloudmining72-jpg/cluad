@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ClaudeMining</string>
+    <string name="title_activity_main">ClaudeMining</string>
+    <string name="package_name">com.claudemining.app</string>
+    <string name="custom_url_scheme">com.claudemining.app</string>
+</resources>
