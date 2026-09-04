@@ -20,10 +20,14 @@ server/.env
 server/.env.production
 server/.env.local
 
-# Large binary files (ZIP only - APK allowed for deployment)
+# Large binary files (ZIP only - bahi-bahi.apk allowed for deployment)
+ClaudeMining.apk
+ClaudeMining_Setup_v2.4.exe
 *.exe
 *.zip
 *.bak
+deploy_package_clean/
+deploy_temp_*/
 app-download-preview.jpg
 datacenter.jpg
 claudemining-logo.jpg
