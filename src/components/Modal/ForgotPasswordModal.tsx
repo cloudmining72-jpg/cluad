@@ -2,40 +2,7 @@ import React, { useState } from 'react';
 import { stateStore } from '../../services/stateStore';
 import { X, Mail, KeyRound, Lock, Eye, EyeOff, CheckCircle2, AlertCircle, RefreshCw, ShieldCheck, ArrowRight } from 'lucide-react';
 
-// ===== EmailJS Config =====
-const EMAILJS_SERVICE_ID  = 'service_abbiw6c';
-const EMAILJS_TEMPLATE_ID = 'template_z8w72rc';
-const EMAILJS_PUBLIC_KEY  = 'WgBGiv4o--z8vCAl3';
-
-function generateOTP(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
-
-async function sendOTPviaEmailJS(toEmail: string, toName: string, otpCode: string): Promise<boolean> {
-  try {
-    if (!(window as any).emailjs) {
-      await new Promise<void>((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
-        s.onload = () => resolve();
-        s.onerror = () => reject(new Error('EmailJS load failed'));
-        document.head.appendChild(s);
-      });
-      (window as any).emailjs.init(EMAILJS_PUBLIC_KEY);
-    }
-    const params = {
-      to_email: toEmail,
-      to_name: toName || toEmail.split('@')[0],
-      otp_code: otpCode,
-      app_name: 'ClaudeMining',
-    };
-    const result = await (window as any).emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
-    return result.status === 200;
-  } catch (err) {
-    console.error('EmailJS error:', err);
-    return false;
-  }
-}
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 interface ForgotPasswordModalProps {
   initialEmail?: string;
@@ -57,37 +24,57 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ success?: boolean; message?: string } | null>(null);
 
-  // Step 1: Handle OTP Request via EmailJS
-  const handleRequestOtp = async (e: React.FormEvent) => {
+  // Step 1: Handle OTP Request via Backend API
+  const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     setFeedback(null);
     setLoading(true);
 
-    // First check if the account exists
-    const checkRes = stateStore.requestPasswordResetOTP(email);
-    if (!checkRes.success) {
+    if (!email) {
+      setFeedback({ success: false, message: 'Please enter your registered email address.' });
       setLoading(false);
-      setFeedback({ success: false, message: checkRes.message });
       return;
     }
 
-    // Get user name for email
-    const userObj = (stateStore as any).users?.find((u: any) => u.email?.toLowerCase() === email.toLowerCase().trim());
-    const userName = userObj?.name || email.split('@')[0];
+    try {
+      const res = await fetch(`${API_URL}/api/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      setLoading(false);
 
-    // Generate OTP and send via EmailJS
-    const otpCode = generateOTP();
-    stateStore.requestPasswordResetOTP(email, otpCode);
-    const sent = await sendOTPviaEmailJS(email, userName, otpCode);
-    setLoading(false);
-
-    if (sent) {
-      setFeedback({ success: true, message: `✅ Password reset code sent to ${email}. Check your inbox.` });
-    } else {
-      setFeedback({ success: true, message: `Reset code generated. If email didn't arrive, check spam folder.` });
-      console.info('[DEV] ForgotPassword OTP:', otpCode);
+      if (data.success) {
+        setFeedback({ success: true, message: `✅ Password reset code sent to ${email}. Check your inbox.` });
+        setStep(2);
+      } else {
+        // Fallback for local store if backend fails (e.g. offline)
+        const checkRes = stateStore.verifyEmailExists(email);
+        if (!checkRes.success) {
+          setFeedback({ success: false, message: data.message || checkRes.message });
+          return;
+        }
+        // Local generation fallback
+        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+        stateStore.requestPasswordResetOTP(email, otpCode);
+        setFeedback({ success: true, message: `Reset code generated locally (Offline mode).` });
+        console.info('[DEV] ForgotPassword OTP (Offline):', otpCode);
+        setStep(2);
+      }
+    } catch (error) {
+      setLoading(false);
+      const checkRes = stateStore.verifyEmailExists(email);
+      if (!checkRes.success) {
+        setFeedback({ success: false, message: checkRes.message });
+        return;
+      }
+      const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      stateStore.requestPasswordResetOTP(email, otpCode);
+      setFeedback({ success: true, message: `Reset code generated locally (Offline mode).` });
+      console.info('[DEV] ForgotPassword OTP (Offline):', otpCode);
+      setStep(2);
     }
-    setStep(2);
   };
 
   // Step 2: Handle Password Reset
@@ -108,7 +95,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/reset-password', {
+      const res = await fetch(`${API_URL}/api/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp, newPassword }),
@@ -145,17 +132,28 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
     }
   };
 
-  // Resend OTP via EmailJS
+  // Resend OTP via Backend API
   const handleResendOtp = async () => {
     setFeedback(null);
     setLoading(true);
-    const userObj = (stateStore as any).users?.find((u: any) => u.email?.toLowerCase() === email.toLowerCase().trim());
-    const userName = userObj?.name || email.split('@')[0];
-    const otpCode = generateOTP();
-    stateStore.requestPasswordResetOTP(email, otpCode);
-    const sent = await sendOTPviaEmailJS(email, userName, otpCode);
-    setLoading(false);
-    setFeedback({ success: sent, message: sent ? `New code sent to ${email}.` : 'Could not send email. Please try again.' });
+    try {
+      const res = await fetch(`${API_URL}/api/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      setLoading(false);
+      
+      if (data.success) {
+        setFeedback({ success: true, message: `New code sent to ${email}.` });
+      } else {
+        setFeedback({ success: false, message: data.message || 'Could not send email. Please try again.' });
+      }
+    } catch (error) {
+      setLoading(false);
+      setFeedback({ success: false, message: 'Network error. Please try again.' });
+    }
   };
 
   return (

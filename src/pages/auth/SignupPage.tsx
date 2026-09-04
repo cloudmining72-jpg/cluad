@@ -2,38 +2,7 @@ import React, { useState } from 'react';
 import { stateStore } from '../../services/stateStore';
 import { Lock, Mail, User as UserIcon, Phone, Globe, Gift, ArrowRight, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 
-// ===== EmailJS Config (Client-side OTP - No server needed) =====
-const EMAILJS_SERVICE_ID  = 'service_abbiw6c';
-const EMAILJS_TEMPLATE_ID = 'template_z8w72rc';
-const EMAILJS_PUBLIC_KEY  = 'WgBGiv4o--z8vCAl3';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
-// Load EmailJS from CDN and send OTP
-async function sendOTPviaEmailJS(toEmail: string, toName: string, otpCode: string): Promise<boolean> {
-  try {
-    if (!(window as any).emailjs) {
-      await new Promise<void>((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
-        s.onload = () => resolve();
-        s.onerror = () => reject(new Error('EmailJS load failed'));
-        document.head.appendChild(s);
-      });
-      (window as any).emailjs.init(EMAILJS_PUBLIC_KEY);
-    }
-    const params = {
-      to_email: toEmail,
-      to_name: toName || toEmail.split('@')[0],
-      otp_code: otpCode,
-      message: `Your ClaudeMining signup verification code is: ${otpCode}. Valid for 15 minutes.`,
-    };
-    await (window as any).emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
-    return true;
-  } catch (err) {
-    console.error('EmailJS error:', err);
-    return false;
-  }
-}
 
 
 const ALL_COUNTRIES = [
@@ -117,7 +86,6 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onSwitchToLogin, onSignu
 
   const [step, setStep] = useState<1 | 2>(1);
   const [otp, setOtp] = useState('');
-  const [localOtp, setLocalOtp] = useState('');
   const [loading, setLoading] = useState(false);
 
   const filteredCountries = ALL_COUNTRIES.filter((c) =>
@@ -143,18 +111,25 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onSwitchToLogin, onSignu
 
     setLoading(true);
 
-    // Generate OTP locally and send via EmailJS
-    const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    setLocalOtp(generatedOtp);
+    // Request OTP from Backend API
+    try {
+      const res = await fetch(`${API_URL}/api/auth/send-signup-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, fullName }),
+      });
+      const data = await res.json();
+      setLoading(false);
 
-    const sent = await sendOTPviaEmailJS(email, fullName, generatedOtp);
-    setLoading(false);
-
-    if (sent) {
-      setFeedback({ success: true, message: `✅ Verification code sent to ${email}. Check your inbox (and spam folder).` });
-      setStep(2);
-    } else {
-      setFeedback({ success: false, message: `Failed to send email. Please check your email address and try again.` });
+      if (data.success) {
+        setFeedback({ success: true, message: `✅ Verification code sent to ${email}. Check your inbox (and spam folder).` });
+        setStep(2);
+      } else {
+        setFeedback({ success: false, message: data.message || `Failed to send email. Please check your email address and try again.` });
+      }
+    } catch (error) {
+      setLoading(false);
+      setFeedback({ success: false, message: 'Network error. Please try again.' });
     }
   };
 
@@ -165,12 +140,6 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onSwitchToLogin, onSignu
 
     if (otp.trim().length !== 6) {
       setFeedback({ success: false, message: 'Please enter the complete 6-digit verification code.' });
-      return;
-    }
-
-    // Verify OTP locally (EmailJS sends it, we verify client-side)
-    if (otp.trim() !== localOtp) {
-      setFeedback({ success: false, message: 'Invalid verification code. Please check your email and try again.' });
       return;
     }
 
@@ -229,11 +198,19 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onSwitchToLogin, onSignu
   const handleResendSignupOtp = async () => {
     setFeedback(null);
     setLoading(true);
-    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    setLocalOtp(newOtp);
-    const sent = await sendOTPviaEmailJS(email, fullName, newOtp);
-    setLoading(false);
-    setFeedback({ success: sent, message: sent ? `New code sent to ${email}.` : `Could not send email. Please try again.` });
+    try {
+      const res = await fetch(`${API_URL}/api/auth/send-signup-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, fullName }),
+      });
+      const data = await res.json();
+      setLoading(false);
+      setFeedback({ success: data.success, message: data.success ? `New code sent to ${email}.` : (data.message || `Could not send email. Please try again.`) });
+    } catch (error) {
+      setLoading(false);
+      setFeedback({ success: false, message: 'Network error. Please try again.' });
+    }
   };
 
   return (
