@@ -2,7 +2,21 @@ import React, { useState } from 'react';
 import { stateStore } from '../../services/stateStore';
 import { X, Mail, KeyRound, Lock, Eye, EyeOff, CheckCircle2, AlertCircle, RefreshCw, ShieldCheck, ArrowRight } from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const getBackendUrl = () => {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  if (typeof window !== 'undefined') {
+    const isCapacitor = !!(window as any)?.Capacitor?.isNativePlatform?.() || 
+                        window.location.protocol === 'capacitor:' || 
+                        window.location.protocol === 'ionic:';
+    if (isCapacitor) return 'https://claudemining.com';
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      return window.location.origin;
+    }
+    return 'http://localhost:5000';
+  }
+  return 'https://claudemining.com';
+};
+const API_URL = getBackendUrl();
 
 interface ForgotPasswordModalProps {
   initialEmail?: string;

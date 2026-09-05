@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { stateStore } from '../../services/stateStore';
+import { API_URL } from '../../services/apiConfig';
 import type { PaymentMethodType } from '../../types';
 import { PlusCircle, MinusCircle, ArrowDownLeft, ArrowUpRight, History, Copy, UploadCloud, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { showToast } from '../../components/ToastContainer';
@@ -61,7 +62,7 @@ export const WalletPage: React.FC<WalletPageProps> = () => {
       formData.append('file', file);
       formData.append('folder', 'payment_proofs');
 
-      const res = await fetch('http://localhost:5000/api/upload/cloudinary', {
+      const res = await fetch(`${API_URL}/api/upload/cloudinary`, {
         method: 'POST',
         body: formData,
       });

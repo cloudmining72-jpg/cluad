@@ -2,7 +2,21 @@ import React, { useState } from 'react';
 import { stateStore } from '../../services/stateStore';
 import { Lock, Mail, User as UserIcon, Phone, Globe, Gift, ArrowRight, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const getBackendUrl = () => {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  if (typeof window !== 'undefined') {
+    const isCapacitor = !!(window as any)?.Capacitor?.isNativePlatform?.() || 
+                        window.location.protocol === 'capacitor:' || 
+                        window.location.protocol === 'ionic:';
+    if (isCapacitor) return 'https://claudemining.com';
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      return window.location.origin;
+    }
+    return 'http://localhost:5000';
+  }
+  return 'https://claudemining.com';
+};
+const API_URL = getBackendUrl();
 
 
 const ALL_COUNTRIES = [

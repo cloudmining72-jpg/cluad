@@ -8,6 +8,21 @@ interface LoginPageProps {
   onLoginSuccess: () => void;
 }
 
+const getBackendUrl = () => {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  if (typeof window !== 'undefined') {
+    const isCapacitor = !!(window as any)?.Capacitor?.isNativePlatform?.() || 
+                        window.location.protocol === 'capacitor:' || 
+                        window.location.protocol === 'ionic:';
+    if (isCapacitor) return 'https://claudemining.com';
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      return window.location.origin;
+    }
+    return 'http://localhost:5000';
+  }
+  return 'https://claudemining.com';
+};
+
 export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignup, onLoginSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -40,7 +55,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignup, onLoginS
 
     // 2. Try backend API login fallback
     try {
-      const apiRes = await fetch('http://localhost:5000/api/auth/login', {
+      const apiRes = await fetch(`${getBackendUrl()}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: cleanEmail, password: cleanPassword }),

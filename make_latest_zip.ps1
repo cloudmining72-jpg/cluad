@@ -30,8 +30,12 @@ Copy-Item "claudex-logo.jpg"         -Destination "$deployDir\" -Force -ErrorAct
 Copy-Item "favicon.svg"              -Destination "$deployDir\" -Force -ErrorAction SilentlyContinue
 Write-Host "  -> Logo files at root OK"
 
-# 4. APK - bahi-bahi.apk RENAMED to ClaudeMining.apk
-if (Test-Path "bahi-bahi.apk") {
+# 4. APK - ClaudeMining.apk or bahi-bahi.apk
+if (Test-Path "ClaudeMining.apk") {
+    Copy-Item "ClaudeMining.apk" -Destination "$deployDir\ClaudeMining.apk" -Force
+    $apkSize = [math]::Round((Get-Item "ClaudeMining.apk").Length / 1MB, 1)
+    Write-Host "  -> ClaudeMining.apk ($apkSize MB) copied - OK"
+} elseif (Test-Path "bahi-bahi.apk") {
     Copy-Item "bahi-bahi.apk" -Destination "$deployDir\ClaudeMining.apk" -Force
     $apkSize = [math]::Round((Get-Item "bahi-bahi.apk").Length / 1MB, 1)
     Write-Host "  -> ClaudeMining.apk ($apkSize MB) from bahi-bahi.apk - OK"

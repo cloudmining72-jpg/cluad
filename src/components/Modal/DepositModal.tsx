@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { PaymentMethodType } from '../../types';
 import { stateStore } from '../../services/stateStore';
+import { API_URL } from '../../services/apiConfig';
 import { X, Copy, CheckCircle2, UploadCloud, ShieldCheck } from 'lucide-react';
 import { showToast } from '../ToastContainer';
 
@@ -34,7 +35,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose }) => {
       formData.append('file', file);
       formData.append('folder', 'payment_proofs');
 
-      const res = await fetch('http://localhost:5000/api/upload/cloudinary', {
+      const res = await fetch(`${API_URL}/api/upload/cloudinary`, {
         method: 'POST',
         body: formData,
       });
