@@ -178,9 +178,9 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onSwitchToLogin, onSignu
       const data = await res.json();
 
       if (data.success) {
-        stateStore.verifySignupOTP(email, otp.trim(), {
-          fullName, email, phone, country, password, referralCode: cleanRefCode,
-        });
+        if (data.user) {
+          stateStore.syncBackendUser(data.user, password);
+        }
         localStorage.removeItem('claudemining_pending_ref_code');
         sessionStorage.removeItem('claudemining_pending_ref_code');
         setLoading(false);
